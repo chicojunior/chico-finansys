@@ -22,6 +22,7 @@
     "angular-imask": "^4.1.4",
     "angular-in-memory-web-api": "^0.8.0",
     "bootstrap": "^4.2.1",
+    "chart.js": "^2.7.3",
     "core-js": "^2.5.4",
     "currency-formatter": "^1.5.3",
     "jquery": "^3.3.1",
