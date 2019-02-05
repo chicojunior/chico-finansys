@@ -40,9 +40,19 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
     this.setPageTitle()
   }
 
+  submitForm() {
+    this.submitingForm = true
+
+    if (this.currentAction == 'new') {
+      this.createCategory()
+    } else {
+      this.updateCategory()
+    }
+  }
+
   // PRIVATE METHODS
   private setPageTitle() {
-    if (this.currentAction == 'new') 
+    if (this.currentAction == 'new')
       this.pageTitle = 'Cadastro de Nova Categoria'
     else {
       const categoryName = this.category.name || ''
@@ -73,11 +83,48 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
       ).subscribe(
         (category) => {
           this.category = category
-          this.categoryForm.patchValue(category) // binds loader category data to categoryForm 
+          this.categoryForm.patchValue(category) // binds loader category data to categoryForm
         },
         (error) => alert('Ocorreu um erro no servidor, tente mais tarde.')
       )
     }
+  }
+
+  private createCategory() {
+    const category: Category = Object.assign(new Category(), this.categoryForm.value)
+
+    this.categoryService
+      .create(category)
+      .subscribe(
+        category => this.actionsForSuccess(category),
+        error => this.actionsForError(error)
+      )
+  }
+
+  private updateCategory() {
+
+  }
+
+  private actionsForSuccess(category: Category) {
+    toastr.success('Solicitação processada com sucesso!')
+
+    // redirect/reload component page
+    this.router
+      .navigateByUrl('categories', { skipLocationChange: true })
+      .then(
+        () => this.router.navigate(['categories', category.id, 'edit'])
+      )
+  }
+
+  private actionsForError(error: any) {
+    toastr.error('Ocorreu um erro ao processar a sua solicitação!')
+
+    this.submitingForm = false
+
+    if (error.status === 422)
+      this.serverErrorMessages = JSON.parse(error._body).serverErrorMessages
+    else
+      this.serverErrorMessages = ['Falha na comunicação com o servidor. Por favor, tente mais tarde.']
   }
 
 }
